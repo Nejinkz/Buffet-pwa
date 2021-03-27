@@ -1,0 +1,17 @@
+﻿@using buffet.ViewModels.Home
+@model  buffet.ViewModels.Home.ClientesViewModel
+@{
+    ViewData["Title"] = "Clientes";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>Lista de Clientes</p>
+
+<ul>
+    
+    @foreach (Cliente cliente in Model.Clientes)
+    {
+        <li>@cliente.Nome nascido em @cliente.DataDeNascimento</li>
+    }
+    
+</ul>

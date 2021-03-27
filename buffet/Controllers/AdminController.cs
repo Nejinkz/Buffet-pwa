@@ -11,11 +11,11 @@ using buffet.ViewModels.Home;
 
 namespace buffet.Controllers
 {
-    public class HomeController : Controller
+    public class AdminController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<AdminController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public AdminController(ILogger<AdminController> logger)
         {
             _logger = logger;
         }
@@ -26,26 +26,27 @@ namespace buffet.Controllers
             return View();
         }
 
+        public IActionResult Ajuda()
+        {
+  
+            return View();
+        }
+        public IActionResult Secao()
+        {
+  
+            return View();
+        }
         public IActionResult Politicaprivacidade()
         {
-            return View();
-        }
-        public IActionResult Login()
-        {
-            return View();
-        }
-        public IActionResult Esqueciasenha()
-        {
-            return View();
-        }
-        public IActionResult Cadastro()
-        {
+  
             return View();
         }
         public IActionResult Termodeuso()
         {
+  
             return View();
         }
+   
         
         public IActionResult Clientes()
         {
