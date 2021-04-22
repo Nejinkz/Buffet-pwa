@@ -7,12 +7,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using buffet.Models;
 using buffet.Models.Buffet.Cliente;
+using buffet.RequestModels;
+using buffet.ViewModels.Acesso;
 using buffet.ViewModels.Home;
 
 namespace buffet.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly AcessoService _acessoService;
+        
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(ILogger<HomeController> logger)
@@ -38,31 +42,64 @@ namespace buffet.Controllers
         {
             return View();
         }
+        [HttpGet]
         public IActionResult Cadastro()
         {
-            return View();
+            var viewmodel = new CadastrarViewModel();
+
+            viewmodel.Mensagem = (string) TempData["msg-cadastro"];
+            viewmodel.ErrosCadastro = (string[]) TempData["erros-cadastro"];
+            
+            return View(viewmodel);
+        }
+        [HttpPost]
+        public async Task<RedirectResult> Cadastro(AcessoCadastrarRequestModel request)
+        {
+            var redirectUrl = "/Home/Cadastro";
+            var email = request.Email;
+            var usuario = request.Usuario;
+            var senha = request.Senha;
+            var senhaConfirmacao = request.SenhaConfirmacao;
+
+            if (email == null)
+            {
+                TempData["msg-cadastro"] = "Por favor insire as informações a baixo";
+                return Redirect(redirectUrl);
+            }
+
+            try
+            {
+             await  _acessoService.RegistrarUsuario(email, senha);
+                return Redirect(url:"/Home/Login");
+            }
+            catch (CadastrarUsuarioException exception)
+            {
+                var listaErros = new List<string>();
+
+                foreach (var identityError in exception.Erros)
+                {
+                    listaErros.Add(identityError.Description);
+                }
+
+                TempData["erros-cadastro"] = listaErros;
+                return Redirect(url:"/Home/Cadastro");
+
+            }
+
+
+
+            return Redirect(redirectUrl);
         }
         public IActionResult Termodeuso()
         {
             return View();
         }
         
-        public IActionResult Clientes()
+        public HomeController(AcessoService acessoService)
         {
-            var clienteService = new ClienteService();
-            var listaDeClientes = clienteService.obterClientes();
+            _acessoService = acessoService;
 
-            var viewModel = new ClientesViewModel();
-            foreach (ClienteEntity clienteEntity in listaDeClientes)
-            {
-                viewModel.Clientes.Add(new Cliente
-                {
-                    Nome = clienteEntity.Nome,
-                        DataDeNascimento = clienteEntity.DataDeNascimento.ToShortDateString()
-                });
-            }
-
-            return View(viewModel);
+            
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
